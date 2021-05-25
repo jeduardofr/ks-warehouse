@@ -12,6 +12,6 @@ def index():
 @app.route('/upload-csv', methods=['POST'])
 def upload_csv():
     truncate_and_import_csv('ks-projects/ks-projects-201801.csv')
-    return "Esau se la come"
+    return "Subido con exito"
 
 app.run()
