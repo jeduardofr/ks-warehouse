@@ -1,5 +1,7 @@
 pandas==1.2.4
 SQLAlchemy==1.4.13
 mysqlclient==2.0.3
+python-dotenv=0.17.1
+python-decouple=3.4
 
 # grep busca cadenas 
