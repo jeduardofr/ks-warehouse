@@ -10,7 +10,7 @@ DB_PORT = config('DB_PORT')
 DB_HOST = config('DB_HOST')
 DB_DRIVER = config('DB_DRIVER')
 
-database_connection = "{}://{}:{}@{}:{}/{}".format(DB_DRIVER, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
+database_connection = "{}://{}:{}@{}:{}/{}?charset=utf8".format(DB_DRIVER, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
 
 def truncate_and_import_csv(file_path: str):
     data = pd.read_csv(file_path)
@@ -33,11 +33,9 @@ def truncate_and_import_csv(file_path: str):
         "usd_goal_real": Float
     }
 
-    print(database_connection)
     engine = create_engine(database_connection)
-    print(engine)
 
-    engine.execute("drop table projects")
+    engine.execute("drop table if exists projects")
 
     data.to_sql(
         "projects", # Nombre de la tabla

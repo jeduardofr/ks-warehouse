@@ -1,13 +1,14 @@
 version: '3'
-services:
 
-  db:
+services:
+  database:
     image: mysql:5.7.22
-    container_name: db
-    restart: unless-stopped
-    tty: true
+    container_name: database
+    restart: always
     ports:
-      - "3306:3306"
+      - 3306:3306
+    expose:
+      - 3306
     environment:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USERNAME}
@@ -16,17 +17,12 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - dbdata:/var/lib/mysql
+      - my-db:/var/lib/mysql
       - ./mysql/my.cnf:/etc/mysql/my.cnf
-    networks:
-      - app-network
+    env_file: .env
+    # Specify character set for table creation
+    command: ['mysqld', '--character-set-server=utf8', '--collation-server=utf8_unicode_ci']
 
-# Docker Networks
-networks:
-  app-network:
-    driver: bridge
-
-# Volumes
 volumes:
-  dbdata:
-    driver: local
+  my-db:
+
