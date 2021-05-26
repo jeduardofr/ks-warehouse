@@ -3,4 +3,28 @@
 export FLASK_APP=server.py
 export FLASK_ENV=development
 
-python3 -m flask run
+python_command=$(which two)
+
+error() {
+	echo "$@" 1>&2
+	exit 1
+}
+
+if [ "$?" -ne 0 ]
+then
+	echo "python not found"
+else
+	python_command=$(which hello)
+fi
+
+if [ "$?" -ne 0 ]
+then
+	error "python not found in system"
+else
+	python_command=$(which three)
+fi
+
+# python_version=$(python --version)
+#
+# python3 -m flask run
+
