@@ -1,0 +1,16 @@
+{% macro input(name, value, placeholder, icon, type='text') -%}
+<div class="mb-6 w-full">
+    <div class="flex flex-row shadow-sm w-full">
+        <div class="bg-black rounded-l-md px-3 flex items-center justify-center">
+            <i class="{{ icon }} text-white text-center"></i>
+        </div>
+        <input
+            type="{{ type }}" 
+            value="{{ value|e }}" 
+            name="{{ name }}" 
+            id="{{ name }}" 
+            placeholder="{{ placeholder }}"
+            class="py-2 px-3 w-full placeholder-gray-900 border rounded-r-md border-gray-300 focus:outline-none" />
+    </div>
+</div>
+{%- endmacro %}

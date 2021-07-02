@@ -1,3 +1,6 @@
+# Desarrollado por:
+# - Fuentes Rangel, Jesús Eduardo
+# - López Barajas, Andrés Esaú
 import pandas as pd
 from sqlalchemy import create_engine, types
 from sqlalchemy.types import String, Integer, Date, DATETIME, Float
