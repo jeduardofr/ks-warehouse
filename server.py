@@ -2,47 +2,26 @@
 # - Fuentes Rangel, Jesús Eduardo
 # - López Barajas, Andrés Esaú
 import os
-from flask import Flask, render_template, request, jsonify
-from sqlalchemy import create_engine
-from database import truncate_and_import_csv, database_connection
+from flask import Flask
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
 
-# @@@: Authentication required
-@app.route("/")
-def index():
-    return render_template('views/session/upload-csv-form.html')
+    import database
 
-# @@@: Authentication required
-@app.route('/upload-csv', methods=['POST'])
-def upload_csv():
-    temporal_file = 'tmp.csv'
+    database.init_app(app)
 
-    uploaded_file = request.files['file']
-    uploaded_file.save(temporal_file)
+    import auth, project
 
-    truncate_and_import_csv(temporal_file)
+    # Register both the auth and project controller
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(project.bp)
 
-    os.remove(temporal_file)
+    # Set the default home route to the index of the project controller
+    app.add_url_rule('/', endpoint="project.index")
 
-    return jsonify({}), 201
-
-@app.route('/login', methods=['GET'])
-def login():
-    return render_template('views/auth/login.html')
-
-@app.route('/login', methods=['POST'])
-def login_process():
-    request
-
-# @@@: Authentication required
-@app.route('/table', methods=['GET', 'POST'])
-def show_table():
-    engine = create_engine(database_connection)
-    rows = engine.execute("select * from projects limit 1000")
-    print(rows)
-    return render_template('views/session/show-table.html', rows=rows)
+    return app
 
 
 if __name__ == "__main__":
-    app.run()
+    create_app().run()

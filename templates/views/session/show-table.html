@@ -5,17 +5,27 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.1/bootstrap3-editable/css/bootstrap-editable.css"
     rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
 {% endblock %}
 
 {% block content %}
-<div class="text-center mt-10">
-    <button type="submit" class="btn btn-success">Corregir</button>
-</div>
+<main class="p-4 container">
+    <h1 class="text-4xl text-gray-800 font-bold">Importar proyectos</h1>
+    <form method="POST" class="mt-4">
+        <div class="text-gray-800">
+            <input type="file" name="file" id="file">
+        </div>
+        <p id="message" class="text-gray-800 text-sm text-center"></p>
+        <div class="text-right">
+            <button id="submit" type="submit" class="bg-purple-500 px-4 py-2 text-gray-200 rounded-md">
+                Subir archivo
+            </button>
+        </div>
+    </form>
 
-<div class="container">
     <br />
+    <h1 class="text-4xl text-gray-800 font-bold">Lista de proyectos</h1>
     <div class="panel panel-default">
-        <div class="panel-heading">DataTable</div>
         <div class="panel-body">
             <div class="table-responsive">
                 <table id="sample_data" class="table table-bordered table-striped">
@@ -60,14 +70,14 @@
             </div>
         </div>
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block script %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.1/bootstrap3-editable/js/bootstrap-editable.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.1/bootstrap3-editable/js/bootstrap-editable.js"></script>
 <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>  
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
@@ -75,6 +85,44 @@
     $(document).ready(function(){
         $('#sample_data').DataTable();
     }); 
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const $submitButton = document.getElementById('submit');
+    const $fileInput    = document.getElementById('file');
+    const $message      = document.getElementById('message');
+
+    $submitButton.addEventListener('click', event => {
+        event.preventDefault();
+
+        const { files } = $fileInput;
+        if (files.length === 0) {
+            alert('No ha seleccionado un archivo a subir');
+            return;
+        }
+
+        const [file] = files;
+        if (file.type !== 'text/csv') {
+            alert('Solo se pueden subir archivos CSV');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        $message.textContent = 'Subiendo...';
+        fetch('/project/import', { method: 'POST', body: formData })
+            .then(response => {
+                if (response.status === 201) {
+                    $message.textContent = '';
+                    alert('Los datos fueron importados con éxito');
+                    location.reload();
+                } else $message.textContent = 'Hubo un error al subir el archivo';
+            })
+            .catch(console.error);
+    });
+});
 </script>
 
 {% endblock %}

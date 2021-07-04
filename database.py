@@ -1,46 +1,54 @@
 # Desarrollado por:
 # - Fuentes Rangel, Jesús Eduardo
 # - López Barajas, Andrés Esaú
-import pandas as pd
-from sqlalchemy import create_engine, types
-from sqlalchemy.types import String, Integer, Date, DATETIME, Float
+import click
+from flask import g, current_app
+from flask.cli import with_appcontext
+from sqlalchemy import create_engine
 from decouple import config
 
-DB_NAME = config('DB_NAME')
-DB_USERNAME = config('DB_USERNAME')
-DB_PASSWORD = config('DB_PASSWORD')
-DB_PORT = config('DB_PORT')
-DB_HOST = config('DB_HOST')
-DB_DRIVER = config('DB_DRIVER')
+def create_db():
+    database_connection = "{}://{}:{}@{}:{}/{}?charset=utf8".format(
+            config('DB_DRIVER'),
+            config('DB_USERNAME'),
+            config('DB_PASSWORD'),
+            config('DB_HOST'),
+            config('DB_PORT'),
+            config('DB_NAME'),
+        )
 
-database_connection = "{}://{}:{}@{}:{}/{}?charset=utf8".format(DB_DRIVER, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
+    return create_engine(database_connection)
 
-def truncate_and_import_csv(file_path: str):
-    data = pd.read_csv(file_path)
+def get_db():
+    if "db" not in g:
+        g.db = create_db()
 
-    map_columns_to_types = {
-        "ID": Integer,
-        "name": String(200),
-        "category": String(200),
-        "main_category": String(200),
-        "currency": String(200),
-        "deadline": Date,
-        "goal": Float,
-        "launched": DATETIME,
-        "pledged": Float,
-        "state": String(200),
-        "backers": Integer,
-        "country": String(200),
-        "usd pledged": Float,
-        "usd_pledged_real": Float,
-        "usd_goal_real": Float
-    }
+    return g.db
 
-    engine = create_engine(database_connection)
+def close_db(e=None):
+    db = g.pop("db", None)
 
-    engine.execute("drop table if exists projects")
+    if db is not None:
+        db.close()
 
-    data.to_sql(
-        "projects", # Nombre de la tabla
-        con=engine, # Conexión a la base de datos
-        dtype=map_columns_to_types) # Mapeo de las columnas del archivo csv a los tipos de mysql
+def init_db():
+    """Clear existing data and create new tables."""
+    db = get_db()
+
+    with current_app.open_resource("schema.sql") as f:
+        db.executescript(f.read().decode("utf8"))
+
+
+@click.command("init-db")
+@with_appcontext
+def init_db_command():
+    """Clear existing data and create new tables."""
+    init_db()
+    click.echo("Initialized the database.")
+
+def init_app(app):
+    """Register database functions with the Flask app. This is called by
+    the application factory.
+    """
+    app.cli.add_command(init_db_command)
+
