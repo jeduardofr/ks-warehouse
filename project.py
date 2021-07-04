@@ -1,6 +1,8 @@
 import functools
 import pandas as pd
 from sqlalchemy.types import String, Integer, Date, DATETIME, Float
+from pymongo import MongoClient, collection, mongo_client
+from decouple import config
 
 from flask import Blueprint
 from flask import flash
@@ -37,21 +39,37 @@ def import_projects():
         "main_category": String(200),
         "currency": String(200),
         "deadline": Date,
-        "goal": Float,
         "launched": DATETIME,
+        "goal": Float,
         "pledged": Float,
-        "state": String(200),
         "backers": Integer,
+        "state": String(200),
         "country": String(200),
         "usd pledged": Float,
         "usd_pledged_real": Float,
         "usd_goal_real": Float
     }
 
+    callback = lambda x: str(x).upper()
+
+    data['name'] = data['name'].apply(callback)
+    data['category'] = data['category'].apply(callback)
+    data['main_category'] = data['main_category'].apply(callback)
+    data['state'] = data['state'].apply(callback)
+    data['country'] = data['country'].apply(callback)
+
+    mongo_client = MongoClient("mongodb://{}:{}@{}:{}".format(
+        config('MONGO_DB_USERNAME'),
+        config('MONGO_DB_PASSWORD'),
+        config('MONGO_DB_HOST'),
+        config('MONGO_DB_PORT')
+        ))
+    mongo_db = mongo_client['kick-starter']
+    project_collection = mongo_db['projects']
+    project_collection.insert_many(data.to_dict('records'))
+
     db = get_db()
-
     db.execute("drop table if exists projects")
-
     data.to_sql(
         "projects", # Nombre de la tabla
         con=db, # Conexión a la base de datos

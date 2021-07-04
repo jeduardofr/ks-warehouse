@@ -23,6 +23,16 @@ services:
     # Specify character set for table creation
     command: ['mysqld', '--character-set-server=utf8', '--collation-server=utf8_unicode_ci']
 
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASSWORD}
+
 volumes:
   my-db:
 
