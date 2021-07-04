@@ -13,7 +13,7 @@
 <body>
     {% if g.user %}
         {% set links = [] %}
-        <nav class="h-20 bg-white border-b fixed top-0 left-0 right-0">
+        <nav class="h-20 bg-white border-b">
             <div class="container h-full">
                 <ul class="flex flex-row justify-end items-center h-full space-x-6">
                     {% for path, text, icon in links %}
@@ -35,9 +35,7 @@
         </nav>
     {% endif %}
 
-    <main class="{% if g.user %}mt-20{% endif %}">
-        {% block content %}{% endblock %}
-    </main>
+    {% block content %}{% endblock %}
 
     <style type="postcss">
     * {
