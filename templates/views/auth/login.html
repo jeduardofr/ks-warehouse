@@ -7,21 +7,21 @@
 <div class="bg-cover flex h-screen justify-center items-center bg-gray-300"
     style="background-image: url(/static/assets/img/siu9.jpg)">
     <div class="shadow-xl mx-auto grid grid-cols-2 bg-white container">
-        <div class="flex flex-col justify-center items-center">
+        <form class="flex flex-col justify-center items-center" method="POST" action="/auth/login">
             <img class="w-48 mb-8" src="/static/assets/img/logo2.png" alt="Logo" />
             <div class="flex flex-col items-center w-3/5">
                 <div class="space-y-4">
-                    {{ forms.input('correo', '', 'Correo Electrónico', 'fas fa-user-alt') }}
-                    {{ forms.input('contrasena', '', 'Contraseña', 'fas fa-key') }}
+                    {{ forms.input('email', '', 'Correo Electrónico', 'fas fa-user-alt') }}
+                    {{ forms.input('password', '', 'Contraseña', 'fas fa-key') }}
                 </div>
 
                 <div class="mt-8 text-right w-full">
-                    <Button v-if="!loading" @click="onLogin($event)" fill>Iniciar Sesión</Button>
-                    <Spinner v-else />
-                    <br />
+                    <button type="submit">
+                        Iniciar sesión
+                    </button>
                 </div>
             </div>
-        </div>
+        </form>
 
         <div>
             <img class="h-140 w-full object-cover" src="/static/assets/img/background.jpg"

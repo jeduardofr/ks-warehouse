@@ -4,9 +4,14 @@
 import os
 from flask import Flask
 from database import init_db
+from decouple import config
 
 def create_app():
     app = Flask(__name__)
+    app.config.from_mapping(
+        # Secret key used to hash sessions for the authentication flow
+        SECRET_KEY=config('SECRET_KEY')
+    )
 
     import database
 

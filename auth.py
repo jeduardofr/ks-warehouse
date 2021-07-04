@@ -27,6 +27,18 @@ def login_required(view):
 
     return wrapped_view
 
+def no_session(view):
+    """View decorator that redirects anonymous users to the login page."""
+
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user:
+            return redirect(url_for("project.index"))
+
+        return view(**kwargs)
+
+    return wrapped_view
+
 
 @bp.before_app_request
 def load_logged_in_user():
@@ -38,19 +50,20 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = (
-            get_db().execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
+            get_db().execute("SELECT * FROM users WHERE id = %s", [user_id]).fetchone()
         )
 
 @bp.route("/login", methods=["GET", "POST"])
+@no_session
 def login():
     """Log in a registered user by adding the user id to the session."""
     if request.method == "POST":
-        username = request.form["email"]
+        email = request.form["email"]
         password = request.form["password"]
         db = get_db()
         error = None
         user = db.execute(
-            "SELECT * FROM user WHERE email = ?", (username,)
+            "SELECT * FROM users WHERE email = %s", [email]
         ).fetchone()
 
         if user is None:
@@ -62,7 +75,7 @@ def login():
             # store the user id in a new session and return to the index
             session.clear()
             session["user_id"] = user["id"]
-            return redirect(url_for("index"))
+            return redirect(url_for("project.index"))
 
         flash(error)
 
@@ -70,6 +83,7 @@ def login():
 
 
 @bp.route("/logout")
+@no_session
 def logout():
     """Clear the current session, including the stored user id."""
     session.clear()
