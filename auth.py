@@ -80,9 +80,8 @@ def login():
     return render_template("views/auth/login.html")
 
 
-@bp.route("/logout")
-@no_session
+@bp.route("/logout", methods=["GET", "POST"])
 def logout():
     """Clear the current session, including the stored user id."""
     session.clear()
-    return redirect(url_for("index"))
+    return {}
