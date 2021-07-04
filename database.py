@@ -6,6 +6,8 @@ from flask import g, current_app
 from flask.cli import with_appcontext
 from sqlalchemy import create_engine
 from decouple import config
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 def create_db():
     database_connection = "{}://{}:{}@{}:{}/{}?charset=utf8".format(
@@ -36,8 +38,10 @@ def init_db():
     db = get_db()
 
     with current_app.open_resource("schema.sql") as f:
-        db.executescript(f.read().decode("utf8"))
+        db.execute(f.read().decode("utf8"))
 
+    db.execute("INSERT INTO users VALUES (%s, %s, %s)",
+            [1, "prueba@gmail.com", generate_password_hash("prueba")])
 
 @click.command("init-db")
 @with_appcontext

@@ -20,11 +20,13 @@ from auth import login_required
 bp = Blueprint("project", __name__, url_prefix="/project")
 
 @bp.route("/", methods=["GET"])
+@login_required
 def index():
     rows = get_db().execute("select * from projects limit 1000")
     return render_template('views/session/show-table.html', rows=rows)
 
 @bp.route("/import", methods=["POST"])
+@login_required
 def import_projects():
     data = pd.read_csv(request.files['file'])
 
