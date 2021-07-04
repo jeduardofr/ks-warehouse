@@ -1,4 +1,4 @@
-{% macro input(name, value, placeholder, icon, type='text') -%}
+{% macro input(name, value, placeholder, icon, type='text', error='') -%}
 <div class="mb-6 w-full">
     <div class="flex flex-row shadow-sm w-full">
         <div class="bg-black rounded-l-md px-3 flex items-center justify-center">
@@ -6,11 +6,22 @@
         </div>
         <input
             type="{{ type }}" 
-            value="{{ value|e }}" 
+            value="{{ value }}" 
             name="{{ name }}" 
             id="{{ name }}" 
             placeholder="{{ placeholder }}"
-            class="py-2 px-3 w-full placeholder-gray-900 border rounded-r-md border-gray-300 focus:outline-none" />
+            class="py-2 px-3 w-full placeholder-gray-600 border rounded-r-md border-gray-300 focus:outline-none text-sm" />
     </div>
+    {% if error %}
+        <span class="text-xs pl-10 text-red-600">{{error}}</span>
+    {% endif %}
 </div>
+{%- endmacro %}
+
+{% macro button(text, type='submit') -%}
+<button
+    type="{{ type }}" 
+    class="border rounded py-2 px-3 text-sm font-bold focus:outline-none bg-blue-500 hover:bg-blue-600 text-white">
+    {{ text }}
+</button>
 {%- endmacro %}

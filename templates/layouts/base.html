@@ -13,13 +13,19 @@
 <body>
     {% block content %}{% endblock %}
 
+    <style type="postcss">
+    * {
+        font-family: 'Roboto';
+    }
+    </style>
     <script src="https://kit.fontawesome.com/4ea0089cb3.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
     <script type="tailwind-config">
     {
         theme: {
+            fontFamily: { sans: ['"Roboto"'], secondary: ['"Raleway"'] },
             extend: {
-                fontFamily: { sans: ['"Roboto"'], secondary: ['"Raleway"'] },
+                spacing: { '80': '20rem', '96': '24rem', '140': '35rem' }
             }
         }
     }
